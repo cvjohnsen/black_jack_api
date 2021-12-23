@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .invisible{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="dealer-hand"></div>
+    <div id="player-hand"></div>
+        <button id="shuffle">Shuffle</button>
+        <button id="play-game"></button>
+        <button id="draw-card" class="invisible"></button>
+        <button id="stay" class="invisible"></button>
+        <button id="reset"></button>
+    <script>
+        //Get Variables
+        const shuffleBtn = document.getElementById('shuffle')
+        const resetBtn = document.getElementById('reset')
+        const stayBtn = document.getElementById('stay')
+        const playBtn = document.getElementById('play-game')
+        const drawBtn = document.getElementById('draw-card')
+
+        // hands
+        const playerHand = document.getElementById('player-hand')
+        const dealerHand = document.getElementById('dealer-hand')
+        // game results
+        const gameResult = document.getElementById('game-result')
+        
+        let deckId;
+        //Create Functions
+
+        function shuffle(){
+            //fetch takes URL (endpoint) as a string
+            //THEN turn response => JSON => JAVASCRIPT OBJECT NOTATION
+            // fetch()
+            // .then(response => response.json())
+            // .then(data => console.log(data))
+            // .catch()
+            fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1")
+            .then(response => response.json())
+            .then(data => {
+                //assigned the deck_id in the JSON TO the deckId global variable
+                console.log ( data.deck_id)
+                deckId = data.deck_id;
+                resetBtn.classList.add(invisible)
+            })
+            .catch(err=>console.log(err))
+        }
+            //Shuffle Function
+                //Calls to Database
+                //Assigns DeckId to a variable
+                //Displays PLAY button -> turn on, not toggle
+        function playGame(){
+            //Play Game Function
+                //Calls to Database for specific deck
+                //Draws FOUR CARDS
+           fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=4`)
+                .then(response => response.json())
+                .then(data => {
+                //Deals FIRST TWO CARDS to the dealer, but only displays
+                //the first card
+                // dealerHand = [data.cards[0], data.cards[1]]
+                // playerHand = [data.cards[2], data.cards[3]]
+                // console.log(dealerHand)
+                //Deals LAST TWO CARDS to the player & displays both cards
+                for(let i = 0; i< data.cards.length; i++){
+                    // wrong
+                    const card = document.createElement('img')
+                    card.setAttribute('src', data.cards[i].image)
+                    if(i===0){
+                        dealerHand.appendChild(card)
+                    }else if (i=== 1){
+                        card.setAttribute('class', 'invisible')
+                        dealerHand.appendChild(card)
+                    }else{
+                        playerHand.appendChild(card)
+                    }
+                }
+                // *** add toggle btn
+                playBtn.classList.toggle('invisible')
+                drawBtn.classList.toggle('invisible')
+                stayBtn.classList.toggle('invisible')
+                shuffle.classList.toggle('invisible')
+                resetBtn.classList.toggle('invisible')       
+                //Toggles play-game & draw-card button off
+                //Toggles draw-card button & stay
+            //
+                //Assigns playerValue & houseValue
+                })
+                .catch(err => console.log(err))  
+        }
+           
+        function drawCard() {
+                fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=4`)
+                    .then(response => response.json())
+                    .then(data => {
+                    //Draw Card Function
+                    // Calls to Database for ONE CARD
+                    // Displays Card
+                       for (let i = 0; i < data.cards.length; i++) {
+                            const card = document.createAttribute('src', data.cards[i].image) 
+                            if (playerHand.value > 21){
+                                console.log("LOSE")
+                                playerHand.appendChild(card)
+                                console.log("DO YOU WANT TO PLAY AGAIN")
+                            }else if (playerHand.value === 21){
+                                console.log("WIN")
+                                playerHand.appendChild(card)
+                                 console.log("DO YOU WANT TO PLAY AGAIN")
+                            } else {
+                                console.log("DO YOU WANT TO PLAY AGAIN")
+                            }
+                       }                    
+                // Calculates new Player Value
+                    // if player value > 21 display lose message
+                        // ask if player wants to play again
+                        // toggle draw & stay OFF
+                        // toggle shuffle ON
+                    // if player value === 21 => display win message
+                        // ask if player wants to play again
+                        // toggle draw & stay OFF
+                        // toggle shuffle ON
+                         playBtn.classList.toggle('invisible')
+                        drawBtn.classList.toggle('invisible')
+                        stayBtn.classList.toggle('invisible')
+                        shuffle.classList.toggle('invisible')
+                        resetBtn.classList.toggle('invisible')
+                    })
+                    .catch(err => console.log(err))
+            }  
+            
+
+            //Stay Function
+            function Stay(){
+                 fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=4`)
+                    .then(response => response.json())
+                    .then(data => {
+                        //Draw Card Function
+                        // Calls to Database for ONE CARD
+                        // Displays Card
+                        for (let i = 0; i < data.cards.length; i++) {
+                            const card = document.createAttribute('src', data.cards[i].image)
+                            if (dealerHand > playerHand) {
+                                console.log("Dealer Wins")
+                               dealerHand.appendChild(card)
+                            } else if (playerHand === 21 && dealerHand != 21) {
+                                console.log("Player WIN")
+                                playerHand.appendChild(card)
+                            } else if (dealerHand === 21 && dealerHand <= cards) {
+                                console.log("DEALER WINS")
+                                dealerHand.appendChild(card)
+                            }else if (playerHand > dealerHand){
+                                console.log('PLAYER WINS')
+                                playerHand.appendChild(card)
+                            }
+                        }
+           })
+                    .catch(err => console.log(err))
+            }
+                //**STRETCH** Continue to draw & calculate for the dealer, as long as the dealer hand is < 21
+
+                //MVP:
+                    //Compare dealer hand against player hand
+                    // if dealer hand > player hand => dealer wins
+                    // if player hand === 21 and dealer hand DOES NOT === 21 => player wins
+                    // if dealer hand === 21 and dealer only has two cards => dealer wins
+                    // if player hand > dealer hand => player wins
+
+                    // ask if player wants to play again
+                        // toggle draw & stay OFF
+                        // toggle shuffle ON
+                
+
+
+        //Attach Functions to Buttons
+
+        shuffleBtn.addEventListener('click', shuffle)
+        reset.addEventListener('click', reset)
+        playBtn.addEventListener('click', playGame)
+        stayBtn.addEventListener('click', stay)
+        drawBtn.addEventListener('click', drawCard)    
+            
+    </script>
+</body>
+</html>
