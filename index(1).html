@@ -15,10 +15,10 @@
     <div id="dealer-hand"></div>
     <div id="player-hand"></div>
         <button id="shuffle">Shuffle</button>
-        <button id="play-game"></button>
-        <button id="draw-card" class="invisible"></button>
-        <button id="stay" class="invisible"></button>
-        <button id="reset"></button>
+        <button id="play-game">Play</button>
+        <button id="draw-card" class="invisible">Draw</button>
+        <button id="stay" class="invisible">Stay</button>
+        <button id="reset">Reset</button>
     <script>
         //Get Variables
         const shuffleBtn = document.getElementById('shuffle')
@@ -61,7 +61,7 @@
             //Play Game Function
                 //Calls to Database for specific deck
                 //Draws FOUR CARDS
-           fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=4`)
+           fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`)
                 .then(response => response.json())
                 .then(data => {
                 //Deals FIRST TWO CARDS to the dealer, but only displays
@@ -98,7 +98,7 @@
         }
            
         function drawCard() {
-                fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=4`)
+                fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`)
                     .then(response => response.json())
                     .then(data => {
                     //Draw Card Function
@@ -136,10 +136,9 @@
                     .catch(err => console.log(err))
             }  
             
-
             //Stay Function
             function Stay(){
-                 fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=4`)
+                 fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`)
                     .then(response => response.json())
                     .then(data => {
                         //Draw Card Function
@@ -177,8 +176,18 @@
                         // toggle draw & stay OFF
                         // toggle shuffle ON
                 
-
-
+            function reset(){
+                while(dealerHand.firstChild){
+                    dealerHand.removeChild(dealerHand.firstChild)
+                }
+                while (playerHand.firstChild) {
+                    playerHand.removeChild(playerHand.firstChild)
+            }
+            gameResult.textContent = ""
+            playBtn.classList.remove('invisible')
+            drawBtn.classList.add('invisible')
+            stayBtn.classList.add('invisible')
+            shuffleBtn.classList.remove('invisible')
         //Attach Functions to Buttons
 
         shuffleBtn.addEventListener('click', shuffle)
